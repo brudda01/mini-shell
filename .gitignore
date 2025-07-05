@@ -1,0 +1,54 @@
+# Build artifacts
+obj/
+bin/
+*.o
+*.a
+*.so
+
+# Executables
+shellkil
+createlock
+test_squashbug
+nolock
+
+# Debug files
+*.dSYM/
+*.gdb_history
+core
+vgcore.*
+
+# Temporary files
+*.tmp
+*.temp
+*~
+.*.swp
+.*.swo
+
+# IDE files
+.vscode/
+.idea/
+*.code-workspace
+
+# OS generated files
+.DS_Store
+Thumbs.db
+
+# History and log files
+.history
+*.log
+
+# Test files
+lock.txt
+test_*
+
+# Backup files
+*.bak
+*.backup
+
+# Coverage files
+*.gcov
+*.gcda
+*.gcno
+
+# Address sanitizer files
+*.asan 

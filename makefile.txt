@@ -1,0 +1,82 @@
+# Compiler and flags
+CC = g++
+CFLAGS = -Wall -Wextra -std=c++14 -O2 -g
+LDFLAGS = -lreadline
+
+# Directories
+SRCDIR = .
+OBJDIR = obj
+BINDIR = bin
+
+# Create directories if they don't exist
+$(shell mkdir -p $(OBJDIR) $(BINDIR))
+
+# Source files
+SHELL_SOURCES = shell.cpp delep.cpp history.cpp squashbug.cpp
+SHELL_OBJECTS = $(SHELL_SOURCES:%.cpp=$(OBJDIR)/%.o)
+
+# Main targets
+.PHONY: all clean distclean utils help install debug
+
+all: shellkil utils
+
+# Main shell executable
+shellkil: $(SHELL_OBJECTS)
+	$(CC) $(CFLAGS) -o $(BINDIR)/shellkil $(SHELL_OBJECTS) $(LDFLAGS)
+
+# Object files
+$(OBJDIR)/shell.o: shell.cpp delep.hpp history.hpp squashbug.hpp
+	$(CC) $(CFLAGS) -c shell.cpp -o $(OBJDIR)/shell.o
+
+$(OBJDIR)/delep.o: delep.cpp delep.hpp
+	$(CC) $(CFLAGS) -c delep.cpp -o $(OBJDIR)/delep.o
+
+$(OBJDIR)/history.o: history.cpp history.hpp
+	$(CC) $(CFLAGS) -c history.cpp -o $(OBJDIR)/history.o
+
+$(OBJDIR)/squashbug.o: squashbug.cpp squashbug.hpp
+	$(CC) $(CFLAGS) -c squashbug.cpp -o $(OBJDIR)/squashbug.o
+
+# Utility programs
+utils: createlock test_squashbug nolock
+
+createlock: createlock.cpp 
+	$(CC) $(CFLAGS) -o $(BINDIR)/createlock createlock.cpp
+
+test_squashbug: test_squashbug.cpp squashbug.cpp squashbug.hpp
+	$(CC) $(CFLAGS) -o $(BINDIR)/test_squashbug test_squashbug.cpp squashbug.cpp
+
+nolock: nolock.cpp
+	$(CC) $(CFLAGS) -o $(BINDIR)/nolock nolock.cpp
+
+# Debug build
+debug: CFLAGS += -DDEBUG -g3 -fsanitize=address
+debug: shellkil
+
+# Install target (copies to /usr/local/bin)
+install: shellkil
+	sudo cp $(BINDIR)/shellkil /usr/local/bin/
+	sudo chmod +x /usr/local/bin/shellkil
+
+# Clean object files
+clean:
+	rm -rf $(OBJDIR)
+
+# Clean everything
+distclean: clean
+	rm -rf $(BINDIR)
+
+# Help target
+help:
+	@echo "Available targets:"
+	@echo "  all          - Build shellkil and utilities (default)"
+	@echo "  shellkil     - Build main shell executable"
+	@echo "  utils        - Build utility programs"
+	@echo "  debug        - Build with debug flags"
+	@echo "  install      - Install shellkil to /usr/local/bin"
+	@echo "  clean        - Remove object files"
+	@echo "  distclean    - Remove all build artifacts"
+	@echo "  help         - Show this help message"
+
+# Default target
+.DEFAULT_GOAL := all
